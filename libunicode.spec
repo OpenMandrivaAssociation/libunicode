@@ -41,6 +41,9 @@ for the libunicode package.
 %setup -q -n %{name}-0.4
 %patch0 -p1 -b .fixflags
 
+# (tv) fix build:
+rm -f ltmain.sh
+libtoolize -c -f 
 #needed by patch0
 rm -f configure
 aclocal-1.4
