@@ -11,6 +11,7 @@ Source0: ftp://ftp.gnome.org/pub/GNOME/sources/%{name}/%{name}-%{version}.tar.bz
 # (fc) 0.4.gnome-3mdk don't add -I/usr/include and -L/usr/lib to CFLAGS/LDFLAGS
 Patch0:  libunicode-0.4.gnome-fixinclude.patch
 Url: http://www.pango.org/download/
+BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires:	automake1.4
 
 %description
