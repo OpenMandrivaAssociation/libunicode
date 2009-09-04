@@ -4,7 +4,7 @@
 Summary: Unicode library
 Name: libunicode
 Version: 0.4.gnome
-Release: %mkrel 13
+Release: %mkrel 14
 License: LGPL
 Group: System/Libraries
 Source0: ftp://ftp.gnome.org/pub/GNOME/sources/%{name}/%{name}-%{version}.tar.bz2
