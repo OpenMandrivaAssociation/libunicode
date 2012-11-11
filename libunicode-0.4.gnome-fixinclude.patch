@@ -1,0 +1,30 @@
+--- libunicode-0.4/unicode-config.in.fixflags	1999-07-31 05:57:00.000000000 +0200
++++ libunicode-0.4/unicode-config.in	2004-09-29 12:31:45.327902954 +0200
+@@ -86,5 +86,5 @@
+ 	echo $includes @UNICODE_DEFS@
+ fi
+ if test "$echo_libs" = "yes"; then
+-	echo -L@libdir@ -lunicode
++	echo -lunicode
+ fi
+--- libunicode-0.4/configure.in.fixflags	2000-05-16 04:23:06.000000000 +0200
++++ libunicode-0.4/configure.in	2004-09-29 12:32:39.739544697 +0200
+@@ -28,8 +28,8 @@
+ AM_CONDITIONAL(NATIVE_ICONV, test "$have_iconv" = yes)
+ AC_SUBST(UNICODE_DEFS)
+ 
+-UNICODE_LIBDIR='-L${libdir}'
+-UNICODE_INCLUDEDIR='-I${includedir} ${UNICODE_DEFS}'
++UNICODE_LIBDIR=''
++UNICODE_INCLUDEDIR='${UNICODE_DEFS}'
+ UNICODE_LIBS='-lunicode'
+ 
+ AC_SUBST(UNICODE_LIBDIR)
+@@ -40,7 +40,6 @@
+ iso/Makefile
+ jis/Makefile
+ msft/Makefile
+-testsuite/Makefile
+ libunicode.spec
+ unicode-config,
+ [case "$CONFIG_FILES" in
