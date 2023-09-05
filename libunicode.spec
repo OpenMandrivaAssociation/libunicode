@@ -3,17 +3,19 @@
 %define devname %mklibname unicode -d
 
 Name: libunicode
-Version: 0.2.1
+Version: 0.3.0
 Release: 1
 Source0: https://github.com/contour-terminal/libunicode/archive/refs/tags/v%{version}.tar.gz
-Patch0: libunicode-0.2.1-compile.patch
-Patch1: libunicode-0.2.1-sharedlibs.patch
+Patch0: https://src.fedoraproject.org/rpms/libunicode/raw/rawhide/f/fix-ucd.patch
 Summary: Modern C++17 Unicode Library
 URL: https://github.com/contour-terminal/libunicode
 License: Apache-2.0
 Group: System/Libraries
 BuildRequires: cmake
 BuildRequires: cmake(Catch2)
+BuildRequires: pkgconfig(fmt)
+BuildRequires: range-v3-devel
+BuildRequires: unicode-ucd
 
 %description
 Modern C++17 Unicode Library
@@ -99,10 +101,11 @@ Feature Overview
 find . -name "*.cpp" -o -name "*.h" |xargs sed -i -e 's,catch2/catch.hpp,catch2/catch_all.hpp,'
 
 %cmake \
+	-DLIBUNICODE_UCD_DIR=%{_datadir}/unicode/ucd \
 	-G Ninja
 
 %build
-export LD_LIBRARY_PATH=$(pwd)/build/src/unicode
+export LD_LIBRARY_PATH=$(pwd)/build/src/libunicode
 %ninja_build -C build
 
 %install
