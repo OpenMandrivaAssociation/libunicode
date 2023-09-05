@@ -1,85 +1,120 @@
 %define major 0
-%define libname %mklibname unicode %{major}
+%define libname %mklibname unicode
+%define devname %mklibname unicode -d
 
-Summary: Unicode library
 Name: libunicode
-Version: 0.4.gnome
-Release: %mkrel 14
-License: LGPL
+Version: 0.2.1
+Release: 1
+Source0: https://github.com/contour-terminal/libunicode/archive/refs/tags/v%{version}.tar.gz
+Patch0: libunicode-0.2.1-compile.patch
+Patch1: libunicode-0.2.1-sharedlibs.patch
+Summary: Modern C++17 Unicode Library
+URL: https://github.com/contour-terminal/libunicode
+License: Apache-2.0
 Group: System/Libraries
-Source0: ftp://ftp.gnome.org/pub/GNOME/sources/%{name}/%{name}-%{version}.tar.bz2
-# (fc) 0.4.gnome-3mdk don't add -I/usr/include and -L/usr/lib to CFLAGS/LDFLAGS
-Patch0:  libunicode-0.4.gnome-fixinclude.patch
-Url: http://www.pango.org/download/
-BuildRoot: %{_tmppath}/%{name}-%{version}-root
-BuildRequires:	automake1.4
+BuildRequires: cmake
+BuildRequires: cmake(Catch2)
 
 %description
-A library to handle unicode strings
+Modern C++17 Unicode Library
+The goal of this library is to bring painless unicode support to C++ with
+simple and easy to understand APIs.
+
+The API naming conventions are chosen to look familiar to those using the C++
+standard libary.
+
+Feature Overview
+ API for accessing UCD properties
+ UTF8 <-> UTF32 conversion
+ wcwidth equivalent (int unicode::width(char32_t))
+ grapheme segmentation (UTS algorithm)
+ symbol/emoji segmentation (UTS algorithm)
+ script segmentation UTS 24
+ unit tests for most parts (wcwidth / segmentation)
+ generic text run segmentation (top level segmentation API suitable for text
+  shaping implementations)
+ word segmentation (UTS algorithm)
+ CLI tool: uc-inspect for inspecting input files by code point properties,
+  grapheme cluster, word, script, ...
 
 %package -n %{libname}
-Summary: %{summary}
-Group: %{group}
-Provides: %{name}
-Obsoletes: %{name}
+Summary: Modern C++17 Unicode Library
+Group: System/Libraries
 
 %description -n %{libname}
-A library to handle unicode strings
+Modern C++17 Unicode Library
+The goal of this library is to bring painless unicode support to C++ with
+simple and easy to understand APIs.
 
-%package -n %{libname}-devel
-Summary: A unicode manipulation library
-Group: Development/Other
-Provides: %{name}-devel = %{name}-%{release}
-Obsoletes: %{name}-devel
-Requires: %{libname} = %{version}
+The API naming conventions are chosen to look familiar to those using the C++
+standard libary.
 
-%description -n %{libname}-devel
-This package package includes the static libraries and header files
-for the libunicode package.
+Feature Overview
+ API for accessing UCD properties
+ UTF8 <-> UTF32 conversion
+ wcwidth equivalent (int unicode::width(char32_t))
+ grapheme segmentation (UTS algorithm)
+ symbol/emoji segmentation (UTS algorithm)
+ script segmentation UTS 24
+ unit tests for most parts (wcwidth / segmentation)
+ generic text run segmentation (top level segmentation API suitable for text
+  shaping implementations)
+ word segmentation (UTS algorithm)
+ CLI tool: uc-inspect for inspecting input files by code point properties,
+  grapheme cluster, word, script, ...
+
+%package -n %{devname}
+Summary: Development files for %{name}
+Group: Development/C
+Requires: %{libname} = %{EVRD}
+
+%description -n %{devname}
+Development files (Headers etc.) for %{name}.
+
+Modern C++17 Unicode Library
+The goal of this library is to bring painless unicode support to C++ with
+simple and easy to understand APIs.
+
+The API naming conventions are chosen to look familiar to those using the C++
+standard libary.
+
+Feature Overview
+ API for accessing UCD properties
+ UTF8 <-> UTF32 conversion
+ wcwidth equivalent (int unicode::width(char32_t))
+ grapheme segmentation (UTS algorithm)
+ symbol/emoji segmentation (UTS algorithm)
+ script segmentation UTS 24
+ unit tests for most parts (wcwidth / segmentation)
+ generic text run segmentation (top level segmentation API suitable for text
+  shaping implementations)
+ word segmentation (UTS algorithm)
+ CLI tool: uc-inspect for inspecting input files by code point properties,
+  grapheme cluster, word, script, ...
 
 %prep
-%setup -q -n %{name}-0.4
-%patch0 -p1 -b .fixflags
+%autosetup -p1
 
-# (tv) fix build:
-rm -f ltmain.sh
-libtoolize -c -f 
-#needed by patch0
-rm -f configure
-aclocal-1.4
-autoconf
+# Adapt to newer catch2
+find . -name "*.cpp" -o -name "*.h" |xargs sed -i -e 's,catch2/catch.hpp,catch2/catch_all.hpp,'
+
+%cmake \
+	-G Ninja
 
 %build
-
-%configure2_5x
-
-%make
+export LD_LIBRARY_PATH=$(pwd)/build/src/unicode
+%ninja_build -C build
 
 %install
-rm -rf $RPM_BUILD_ROOT
-%makeinstall_std
+%ninja_install -C build
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
-%if %mdkversion < 200900
-%post -n %{libname} -p /sbin/ldconfig
-%endif
-
-%if %mdkversion < 200900
-%postun -n %{libname} -p /sbin/ldconfig
-%endif
+%files
+%{_bindir}/*
 
 %files -n %{libname}
-%defattr(-,root,root)
-%doc README AUTHORS COPYING ChangeLog TODO
-%{_libdir}/*.so.*
+%{_libdir}/*.so.%{major}*
 
-%files -n %{libname}-devel
-%defattr(-, root, root)
-%{_bindir}/*
-%{_libdir}/*.so
-%{_libdir}/*a
-%{_libdir}/*.sh
+%files -n %{devname}
 %{_includedir}/*
-
+%{_libdir}/*.so
+%{_libdir}/cmake/*

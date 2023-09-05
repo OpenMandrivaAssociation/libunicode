@@ -1,0 +1,59 @@
+diff -up libunicode-0.2.1/src/unicode/CMakeLists.txt.omv~ libunicode-0.2.1/src/unicode/CMakeLists.txt
+--- libunicode-0.2.1/src/unicode/CMakeLists.txt.omv~	2023-09-05 14:40:28.862044912 +0200
++++ libunicode-0.2.1/src/unicode/CMakeLists.txt	2023-09-05 14:43:54.965546786 +0200
+@@ -28,7 +28,7 @@ if(IS_DIRECTORY "${LIBUNICODE_UCD_DIR}")
+     )
+ endif()
+ 
+-add_library(unicode_ucd STATIC
++add_library(unicode_ucd SHARED
+     ucd.cpp
+     ucd.h
+     ucd_enums.h
+@@ -36,6 +36,7 @@ add_library(unicode_ucd STATIC
+     ucd_ostream.h
+ )
+ add_library(unicode::ucd ALIAS unicode_ucd)
++set_target_properties(unicode_ucd PROPERTIES SOVERSION 0)
+ target_include_directories(unicode_ucd PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                                               $<INSTALL_INTERFACE:include>)
+ 
+@@ -58,15 +59,16 @@ add_custom_command(
+     VERBATIM
+ )
+ 
+-add_library(unicode_loader STATIC codepoint_properties_loader.h codepoint_properties_loader.cpp)
++add_library(unicode_loader SHARED codepoint_properties_loader.h codepoint_properties_loader.cpp)
+ add_library(unicode::loader ALIAS unicode_loader)
++set_target_properties(unicode_loader PROPERTIES SOVERSION 0)
+ target_include_directories(unicode_loader PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                                                  $<INSTALL_INTERFACE:include>)
+ target_link_libraries(unicode_loader PUBLIC  unicode::ucd)
+ 
+ # =========================================================================================================
+ 
+-add_library(unicode STATIC
++add_library(unicode SHARED
+     capi.cpp
+     codepoint_properties.cpp
+     emoji_segmenter.cpp
+@@ -80,6 +82,7 @@ add_library(unicode STATIC
+     codepoint_properties_data.cpp
+     codepoint_properties_names.cpp
+ )
++set_target_properties(unicode PROPERTIES SOVERSION 0)
+ 
+ set(public_headers
+     capi.h
+diff -up libunicode-0.2.1/src/tools/CMakeLists.txt.omv~ libunicode-0.2.1/src/tools/CMakeLists.txt
+--- libunicode-0.2.1/src/tools/CMakeLists.txt.omv~	2023-09-05 14:53:54.158208690 +0200
++++ libunicode-0.2.1/src/tools/CMakeLists.txt	2023-09-05 14:53:57.734246856 +0200
+@@ -8,8 +8,5 @@ if(LIBUNICODE_TOOLS)
+ 
+     add_executable(unicode-query unicode-query.cpp)
+     target_link_libraries(unicode-query unicode)
+-    if(UNIX)
+-        target_link_libraries(unicode-query "-static")
+-    endif()
+     install(TARGETS unicode-query DESTINATION bin)
+ endif()
